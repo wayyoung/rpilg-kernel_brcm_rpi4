@@ -354,12 +354,13 @@
 			/* Map inbound accesses from pci:0x0_00000000..ffffffff
 			 * to scb:0x0_00000000-ffffffff
 			 */
-			dma-ranges = <0x02000000 0x0 0x00000000  0x0 0x00000000
+			dma-ranges = <0x02000000 0x1 0x00000000  0x0 0x00000000
 				      0x1 0x00000000>;
 			status = "okay";
 		};
 
 		genet: genet@7d580000 {
+			local-mac-address = [dc a6 32 9c c2 fb];
 			compatible = "brcm,genet-v5";
 			reg = <0x0 0x7d580000 0x10000>;
 			status = "okay";

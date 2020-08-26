@@ -5,19 +5,29 @@
 #include "bcm283x-rpi-csi1-2lane.dtsi"
 
 / {
+	memreserve = <0x3b400000 0x4c00000>;
+	serial-number = "100000005f703464";
 	compatible = "raspberrypi,4-model-b", "brcm,bcm2711";
-	model = "Raspberry Pi 4 Model B";
+	model = "Raspberry Pi 4 Model B2";
 
 	memory@0 {
 		device_type = "memory";
-		reg = <0x0 0x0 0x0>;
+		reg = <0x0 0x0 0x3b400000 0x0 0x40000000 0xbc000000>;
 	};
 
+//	system {
+//		linux,serial = <0x10000000 0x5f703464>;
+//		linux,revision = <0xc03112>;
+//	};
+
 	chosen {
-		bootargs = "coherent_pool=1M 8250.nr_uarts=1 cma=64M";
+		bootargs = "coherent_pool=1M 8250.nr_uarts=1 cma=64M"; 
 	};
 
 	aliases {
+		i2c_vc = &i2c0;
+		i2c = &i2c1;
+		i2c_arm = &i2c1;
 		serial0 = &uart1;
 		serial1 = &uart0;
 		mmc0 = &emmc2;
@@ -31,6 +41,15 @@
 		/delete-property/ intc;
 		ethernet0 = &genet;
 		pcie0 = &pcie_0;
+	};
+};
+
+/ {
+	axi {
+	
+		vc_mem {
+			reg = <0x3ec00000 0x40000000 0xc0000000>;
+		};
 	};
 };
 
@@ -71,6 +90,7 @@
 };
 
 &spi0 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&spi0_pins &spi0_cs_pins>;
 	cs-gpios = <&gpio 8 1>, <&gpio 7 1>;
@@ -152,6 +172,7 @@
 &audio {
 	pinctrl-names = "default";
 	pinctrl-0 = <&audio_pins>;
+	status = "okay";
 };
 
 &sdhost_gpio48 {
@@ -264,10 +285,16 @@
 		brcm,pull = <2>;
 	};
 
+//	uart0_pins: uart0_pins {
+//		brcm,pins = <32 33>;
+//		brcm,function = <BCM2835_FSEL_ALT3>;
+//		brcm,pull = <0 2>;
+//	};
+
 	uart0_pins: uart0_pins {
-		brcm,pins = <32 33>;
+		brcm,pins = <0x1e 0x1f 0x20 0x21>;
 		brcm,function = <BCM2835_FSEL_ALT3>;
-		brcm,pull = <0 2>;
+		brcm,pull = <0x2 0x0 0x0 0x2>;
 	};
 
 	uart1_pins: uart1_pins {
@@ -310,12 +337,14 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c0_pins>;
 	clock-frequency = <100000>;
+	status = "okay";
 };
 
 &i2c1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c1_pins>;
 	clock-frequency = <100000>;
+	status = "okay";
 };
 
 &i2c2 {
@@ -329,6 +358,13 @@
 
 / {
 	__overrides__ {
+		i2c_arm_baudrate = "", "", "", "*clock-frequency:0";
+		i2c_baudrate = "", "", "", "*clock-frequency:0";
+		i2c_arm = "", "", "", "*status";
+		i2c = "", "", "", "*status";
+		i2c_vc_baudrate = "", "", "", ")clock-frequency:0";
+		i2c_vc = "", "", "", ")status";
+		
 		act_led_gpio = <&act_led>,"gpios:4";
 		act_led_activelow = <&act_led>,"gpios:8";
 		act_led_trigger = <&act_led>,"linux,default-trigger";
